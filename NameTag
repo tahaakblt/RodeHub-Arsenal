@@ -1,13 +1,13 @@
 
---- Tut
 
-local esp_settings = { ---- table for esp settings 
+
+local esp_settings = { 
     textsize = 8,
     colour = 255,255,255
 }
 
 local gui = Instance.new("BillboardGui")
-local esp = Instance.new("TextLabel",gui) ---- new instances to make the billboard gui and the textlabel
+local esp = Instance.new("TextLabel",gui) 
 
 
 
@@ -24,11 +24,11 @@ esp.BorderColor3 = Color3.new(esp_settings.colour)
 esp.BorderSizePixel = 0
 esp.Font = "GothamSemibold"
 esp.TextSize = esp_settings.textsize
-esp.TextColor3 = Color3.fromRGB(esp_settings.colour) -- text colour
+esp.TextColor3 = Color3.fromRGB(esp_settings.colour) 
 
-game:GetService("RunService").RenderStepped:Connect(function() ---- loops faster than a while loop :)
+game:GetService("RunService").RenderStepped:Connect(function() 
     for i,v in pairs (game:GetService("Players"):GetPlayers()) do
-        if v ~= game:GetService("Players").LocalPlayer and v.Character.Head:FindFirstChild("Cracked esp")==nil and v.TeamColor ~= game:GetService("Players").LocalPlayer.TeamColor then -- craeting checks for team check, local player etc
+        if v ~= game:GetService("Players").LocalPlayer and v.Character.Head:FindFirstChild("Cracked esp")==nil and v.TeamColor ~= game:GetService("Players").LocalPlayer.TeamColor then 
             esp.Text = "{"..v.Name.."}"
             gui:Clone().Parent = v.Character.Head
     end
