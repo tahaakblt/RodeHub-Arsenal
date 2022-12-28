@@ -1,5 +1,5 @@
 local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
-local Window = Library.CreateLib("RodeHub | Arsenal", "DarkTheme")
+local Window = Library.CreateLib("RodeHub , Arsenal | tahaakblt#5633", "DarkTheme")
 
 -- Aimbot Tab
 local Tab = Window:NewTab("Aimbot")
@@ -97,8 +97,10 @@ Tab:NewLabel("Using Right Click, Sağ Tika Basili Tut")
 
 local Tab2 = Window:NewTab("Esp")
 local Tab2 = Tab2:NewSection("Esp Tab")
+
 -- BOX ESP
-local lplr = game.Players.LocalPlayer
+Tab2:NewButton("Esp Box", "(:", function()
+    local lplr = game.Players.LocalPlayer
 local camera = game:GetService("Workspace").CurrentCamera
 local CurrentCamera = workspace.CurrentCamera
 local worldToViewportPoint = CurrentCamera.worldToViewportPoint
@@ -218,6 +220,7 @@ game.Players.PlayerAdded:Connect(function(v)
     coroutine.wrap(boxesp)()
 end)
 
+end)
 
 -- CHAMS
 Tab2:NewButton("Chams", "(:", function()
@@ -279,3 +282,7 @@ game:GetService("RunService").RenderStepped:Connect(function()
 end
 end)
 end)
+
+
+
+
