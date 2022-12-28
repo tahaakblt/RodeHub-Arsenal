@@ -1,0 +1,346 @@
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("RodeHub | Arsenal", "DarkTheme")
+
+-- Aimbot Tab
+local Tab = Window:NewTab("Aimbot")
+local Tab = Tab:NewSection("Aimbot Tab")
+
+Tab:NewButton("Aimbot", "Using Right Click", function()
+    local dwCamera = workspace.CurrentCamera
+local dwRunService = game:GetService("RunService")
+local dwUIS = game:GetService("UserInputService")
+local dwEntities = game:GetService("Players")
+local dwLocalPlayer = dwEntities.LocalPlayer
+local dwMouse = dwLocalPlayer:GetMouse()
+
+local settings = {
+    Aimbot = true,
+    Aiming = false,
+    Aimbot_AimPart = "Head",
+    Aimbot_TeamCheck = true,
+    Aimbot_Draw_FOV = true,
+    Aimbot_FOV_Radius = 160,
+    Aimbot_FOV_Color = Color3.fromRGB(255,255,255)
+}
+
+local fovcircle = Drawing.new("Circle")
+fovcircle.Visible = settings.Aimbot_Draw_FOV
+fovcircle.Radius = settings.Aimbot_FOV_Radius
+fovcircle.Color = settings.Aimbot_FOV_Color
+fovcircle.Thickness = 1
+fovcircle.Filled = false
+fovcircle.Transparency = 1
+
+fovcircle.Position = Vector2.new(dwCamera.ViewportSize.X / 2, dwCamera.ViewportSize.Y / 2)
+
+dwUIS.InputBegan:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton2 then
+        settings.Aiming = true
+    end
+end)
+
+dwUIS.InputEnded:Connect(function(i)
+    if i.UserInputType == Enum.UserInputType.MouseButton2 then
+        settings.Aiming = false
+    end
+end)
+
+dwRunService.RenderStepped:Connect(function()
+    
+    local dist = math.huge
+    local closest_char = nil
+
+    if settings.Aiming then
+
+        for i,v in next, dwEntities:GetChildren() do 
+
+            if v ~= dwLocalPlayer and
+            v.Character and
+            v.Character:FindFirstChild("HumanoidRootPart") and
+            v.Character:FindFirstChild("Humanoid") and
+            v.Character:FindFirstChild("Humanoid").Health > 0 then
+
+                if settings.Aimbot_TeamCheck == true and
+                v.Team ~= dwLocalPlayer.Team or
+                settings.Aimbot_TeamCheck == false then
+
+                    local char = v.Character
+                    local char_part_pos, is_onscreen = dwCamera:WorldToViewportPoint(char[settings.Aimbot_AimPart].Position)
+
+                    if is_onscreen then
+
+                        local mag = (Vector2.new(dwMouse.X, dwMouse.Y) - Vector2.new(char_part_pos.X, char_part_pos.Y)).Magnitude
+
+                        if mag < dist and mag < settings.Aimbot_FOV_Radius then
+
+                            dist = mag
+                            closest_char = char
+
+                        end
+                    end
+                end
+            end
+        end
+
+        if closest_char ~= nil and
+        closest_char:FindFirstChild("HumanoidRootPart") and
+        closest_char:FindFirstChild("Humanoid") and
+        closest_char:FindFirstChild("Humanoid").Health > 0 then
+
+            dwCamera.CFrame = CFrame.new(dwCamera.CFrame.Position, closest_char[settings.Aimbot_AimPart].Position)
+        end
+    end
+end)
+end)
+Tab:NewLabel("Using Right Click, Sağ Tika Basili Tut")
+-- ESP TAB
+
+local Tab2 = Window:NewTab("Esp")
+local Tab2 = Tab2:NewSection("Esp Tab")
+-- BOX ESP
+Tab2:NewButton("Esp Box", "(:", function()
+
+    local lplr = game.Players.LocalPlayer
+local camera = game:GetService("Workspace").CurrentCamera
+local CurrentCamera = workspace.CurrentCamera
+local worldToViewportPoint = CurrentCamera.worldToViewportPoint
+
+local HeadOff = Vector3.new(0, 0.5, 0)
+local LegOff = Vector3.new(0,3,0)
+
+for i,v in pairs(game.Players:GetChildren()) do
+    local BoxOutline = Drawing.new("Square")
+    BoxOutline.Visible = false
+    BoxOutline.Color = Color3.new(0,0,0)
+    BoxOutline.Thickness = 3
+    BoxOutline.Transparency = 1
+    BoxOutline.Filled = false
+
+    local Box = Drawing.new("Square")
+    Box.Visible = false
+    Box.Color = Color3.new(1,1,1)
+    Box.Thickness = 1
+    Box.Transparency = 1
+    Box.Filled = false
+
+    local HealthBarOutline = Drawing.new("Square")
+    HealthBarOutline.Thickness = 3
+    HealthBarOutline.Filled = false
+    HealthBarOutline.Color = Color3.new(0,0,0)
+    HealthBarOutline.Transparency = 1
+    HealthBarOutline.Visible = false
+
+    local HealthBar = Drawing.new("Square")
+    HealthBar.Thickness = 1
+    HealthBar.Filled = false
+    HealthBar.Transparency = 1
+    HealthBar.Visible = false
+
+    function boxesp()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if v.Character ~= nil and v.Character:FindFirstChild("Humanoid") ~= nil and v.Character:FindFirstChild("HumanoidRootPart") ~= nil and v ~= lplr and v.Character.Humanoid.Health > 0 then
+                local Vector, onScreen = camera:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
+
+                local RootPart = v.Character.HumanoidRootPart
+                local Head = v.Character.Head
+                local RootPosition, RootVis = worldToViewportPoint(CurrentCamera, RootPart.Position)
+                local HeadPosition = worldToViewportPoint(CurrentCamera, Head.Position + HeadOff)
+                local LegPosition = worldToViewportPoint(CurrentCamera, RootPart.Position - LegOff)
+
+                if onScreen then
+                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
+                    BoxOutline.Visible = true
+
+                    Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    Box.Visible = true
+
+                    HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+                    HealthBarOutline.Position = BoxOutline.Position - Vector2.new(6,0)
+                    HealthBarOutline.Visible = true
+
+                    HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / math.clamp(game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value, 0, game:GetService("Players")[v.Character.Name].NRPBS:WaitForChild("MaxHealth").Value)))
+                    HealthBar.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1 / HealthBar.Size.Y))
+                    HealthBar.Color = Color3.fromRGB(255 - 255 / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value), 255 / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value), 0)
+                    HealthBar.Visible = true
+
+                    if v.TeamColor == lplr.TeamColor then
+                        --- Our Team
+                        BoxOutline.Visible = false
+                        Box.Visible = false
+                        HealthBarOutline.Visible = false
+                        HealthBar.Visible = false
+                    else
+                        ---Enemy Team
+                        BoxOutline.Visible = true
+                        Box.Visible = true
+                        HealthBarOutline.Visible = true
+                        HealthBar.Visible = true
+                    end
+
+                else
+                    BoxOutline.Visible = false
+                    Box.Visible = false
+                    HealthBarOutline.Visible = false
+                    HealthBar.Visible = false
+                end
+            else
+                BoxOutline.Visible = false
+                Box.Visible = false
+                HealthBarOutline.Visible = false
+                HealthBar.Visible = false
+            end
+        end)
+    end
+    coroutine.wrap(boxesp)()
+end
+
+game.Players.PlayerAdded:Connect(function(v)
+    local BoxOutline = Drawing.new("Square")
+    BoxOutline.Visible = false
+    BoxOutline.Color = Color3.new(0,0,0)
+    BoxOutline.Thickness = 3
+    BoxOutline.Transparency = 1
+    BoxOutline.Filled = false
+
+    local Box = Drawing.new("Square")
+    Box.Visible = false
+    Box.Color = Color3.new(1,1,1)
+    Box.Thickness = 1
+    Box.Transparency = 1
+    Box.Filled = false
+
+    local HealthBarOutline = Drawing.new("Square")
+    HealthBarOutline.Thickness = 3
+    HealthBarOutline.Filled = false
+    HealthBarOutline.Color = Color3.new(0,0,0)
+    HealthBarOutline.Transparency = 1
+    HealthBarOutline.Visible = false
+
+    local HealthBar = Drawing.new("Square")
+    HealthBar.Thickness = 1
+    HealthBar.Filled = false
+    HealthBar.Transparency = 1
+    HealthBar.Visible = false
+
+    function boxesp()
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if v.Character ~= nil and v.Character:FindFirstChild("Humanoid") ~= nil and v.Character:FindFirstChild("HumanoidRootPart") ~= nil and v ~= lplr and v.Character.Humanoid.Health > 0 then
+                local Vector, onScreen = camera:worldToViewportPoint(v.Character.HumanoidRootPart.Position)
+
+                local RootPart = v.Character.HumanoidRootPart
+                local Head = v.Character.Head
+                local RootPosition, RootVis = worldToViewportPoint(CurrentCamera, RootPart.Position)
+                local HeadPosition = worldToViewportPoint(CurrentCamera, Head.Position + HeadOff)
+                local LegPosition = worldToViewportPoint(CurrentCamera, RootPart.Position - LegOff)
+
+                if onScreen then
+                    BoxOutline.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    BoxOutline.Position = Vector2.new(RootPosition.X - BoxOutline.Size.X / 2, RootPosition.Y - BoxOutline.Size.Y / 2)
+                    BoxOutline.Visible = true
+
+                    Box.Size = Vector2.new(1000 / RootPosition.Z, HeadPosition.Y - LegPosition.Y)
+                    Box.Position = Vector2.new(RootPosition.X - Box.Size.X / 2, RootPosition.Y - Box.Size.Y / 2)
+                    Box.Visible = true
+
+                    HealthBarOutline.Size = Vector2.new(2, HeadPosition.Y - LegPosition.Y)
+                    HealthBarOutline.Position = BoxOutline.Position - Vector2.new(6,0)
+                    HealthBarOutline.Visible = true
+
+                    HealthBar.Size = Vector2.new(2, (HeadPosition.Y - LegPosition.Y) / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / math.clamp(game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value, 0, game:GetService("Players")[v.Character.Name].NRPBS:WaitForChild("MaxHealth").Value)))
+                    HealthBar.Position = Vector2.new(Box.Position.X - 6, Box.Position.Y + (1/HealthBar.Size.Y))
+		    HealthBar.Color = Color3.fromRGB(255 - 255 / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value), 255 / (game:GetService("Players")[v.Character.Name].NRPBS["MaxHealth"].Value / game:GetService("Players")[v.Character.Name].NRPBS["Health"].Value), 0)                    
+		    HealthBar.Visible = true
+
+                    if v.TeamColor == lplr.TeamColor then
+                        --- Our Team
+                        BoxOutline.Visible = false
+                        Box.Visible = false
+                        HealthBarOutline.Visible = false
+                        HealthBar.Visible = false
+                    else
+                        ---Enemy Team
+                        BoxOutline.Visible = true
+                        Box.Visible = true
+                        HealthBarOutline.Visible = true
+                        HealthBar.Visible = true
+                    end
+
+                else
+                    BoxOutline.Visible = false
+                    Box.Visible = false
+                    HealthBarOutline.Visible = false
+                    HealthBar.Visible = false
+                end
+            else
+                BoxOutline.Visible = false
+                Box.Visible = false
+                HealthBarOutline.Visible = false
+                HealthBar.Visible = false
+            end
+        end)
+    end
+    coroutine.wrap(boxesp)()
+end)
+end)
+-- CHAMS
+Tab2:NewButton("Chams", "(:", function()
+
+    local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+    local Highlight = Instance.new("Highlight")
+    Highlight.Name = "Highlight"
+    function ApplyToCurrentPlayers()
+        for i,player in pairs(Players:GetChildren()) do 
+            repeat wait() until player.Character
+            if not player.Character:FindFirstChild("HumanoidRootPart"):FindFirstChild("Highlight") then
+                local HighlightClone = Highlight:Clone()
+                HighlightClone.Adornee = player.Character
+                HighlightClone.Parent = player.Character:FindFirstChild("HumanoidRootPart")
+                HighlightClone.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                HighlightClone.Name = "Highlight"
+            end
+        end
+    end    
+    RunService.Heartbeat:Connect(function()
+        ApplyToCurrentPlayers()
+    end)    
+end)
+-- NameTags
+Tab2:NewButton("NameTags", "(:", function()
+    
+local esp_settings = { 
+    textsize = 8,
+    colour = 255,255,255
+}
+
+local gui = Instance.new("BillboardGui")
+local esp = Instance.new("TextLabel",gui) 
+
+
+
+gui.Name = "RodeHub"; ---- properties of the esp
+gui.ResetOnSpawn = false
+gui.AlwaysOnTop = true;
+gui.LightInfluence = 0;
+gui.Size = UDim2.new(1.75, 0, 1.75, 0);
+esp.BackgroundColor3 = Color3.fromRGB(255, 255, 255);
+esp.Text = ""
+esp.Size = UDim2.new(0.0001, 0.00001, 0.0001, 0.00001);
+esp.BorderSizePixel = 4;
+esp.BorderColor3 = Color3.new(esp_settings.colour)
+esp.BorderSizePixel = 0
+esp.Font = "GothamSemibold"
+esp.TextSize = esp_settings.textsize
+esp.TextColor3 = Color3.fromRGB(esp_settings.colour) 
+
+game:GetService("RunService").RenderStepped:Connect(function() 
+    for i,v in pairs (game:GetService("Players"):GetPlayers()) do
+        if v ~= game:GetService("Players").LocalPlayer and v.Character.Head:FindFirstChild("RodeHub")==nil and v.TeamColor ~= game:GetService("Players").LocalPlayer.TeamColor then 
+            esp.Text = "{"..v.Name.."}"
+            gui:Clone().Parent = v.Character.Head
+    end
+end
+end)
+end)
